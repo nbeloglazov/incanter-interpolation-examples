@@ -1,12 +1,13 @@
 (ns function-interpolation.core
-  (:require [quil.core :refer :all]))
+  (:require [quil.core :refer :all]
+            [quil.helpers.drawing :refer (line-join-points)]
+            [incanter.interpolation :refer (interpolate approximate)]))
 
 (defn col [val]
   (map #(bit-and 0xFF %)
        [(bit-shift-right val 16)
         (bit-shift-right val 8)
         val]))
-
 
 (def points (atom []))
 
@@ -21,8 +22,8 @@
 (def dragged-point (atom nil))
 
 (def checkboxes (atom (into {} [[:parametric false ]
-                                [:linear false]
-                                [:polynomial true]
+                                [:linear true]
+                                [:polynomial false]
                                 [:cubic-spline false]
                                 [:b-spline false]])))
 
@@ -32,14 +33,52 @@
                     :cubic-spline "Cubic spline"
                     :b-spline "B-spline 3 order"})
 
+(def work-future (atom (future)))
+
+(def curves (atom {}))
+
 (def colors {:parametric (col 0)
              :linear (col 0x9BBB59)
              :polynomial (col 0x8064A2)
              :cubic-spline (col 0x4BACC6)
              :b-spline (col 0xF79646)})
 
+(def interpolators
+  (assoc (into {}
+               (for [type [:linear :polynomial :cubic-spline]]
+                 [type #(interpolate % type)]))
+    :b-spline (fn [points]
+                (let [min (first (first points))
+                      max (first (last points))
+                      approximator (approximate (map second points))]
+                  (fn [x]
+                    (approximator (/ (- x min) (- max min))))))))
+
+(defn get-plot-xs [points-xs]
+  (let [min (first points-xs)
+        max (last points-xs)]
+    (->> (range min max (/ (- max min) 500))
+         (concat points-xs)
+         sort)))
+
 (defn indexed [coll]
   (map-indexed vector coll))
+
+(defn recalculate-curves [points parametric?]
+  (when (> (count points) 1)
+    (let [points (if parametric? (indexed points) (sort-by first points))
+          xs (get-plot-xs (map first points))]
+      (swap! curves empty)
+      (doseq [type (keys interpolators)]
+        (when-not (and (= type :cubic-spline)
+                       (< (count points) 3))
+          (let [ps (map ((interpolators type) points) xs)
+                ps (if parametric? ps (map vector xs ps))]
+            (swap! curves assoc type (line-join-points ps))))))))
+
+(defn points-changed [points]
+  (future-cancel @work-future)
+  (reset! work-future (future (recalculate-curves points (:parametric @checkboxes)))))
 
 (defn remove-nth [coll n]
   (->> (indexed coll)
@@ -77,7 +116,9 @@
 (defn mouse-clicked []
   (println "Mouse clicked")
   (if-let [id (find-checkbox (mouse-point))]
-    (swap! checkboxes update-in [id] not)
+    (do (swap! checkboxes update-in [id] not)
+        (when (= id :parametric)
+          (points-changed @points)))
     (swap! points
          (if (= (mouse-button) :left) conj remove-point)
          (mouse-point))))
@@ -119,8 +160,18 @@
     (doseq [[ind checkbox] (indexed @checkboxes)]
       (draw-checkbox checkbox 30 (* 50 (inc ind))))))
 
+(defn draw-curve [lines]
+  (dorun (map #(apply line %) lines)))
+
+(defn draw-curves []
+  (doseq [[type curve] @curves]
+    (when (@checkboxes type)
+      (apply stroke (colors type))
+      (draw-curve curve))))
+
 (defn draw []
   (background 255)
+  (draw-curves)
   (draw-points @points)
   (draw-control-panel))
 
@@ -135,6 +186,9 @@
    :size [800 600]
    :mouse-clicked mouse-clicked
    :mouse-pressed mouse-pressed
-   :mouse-dragged mouse-dragged))
+   :mouse-dragged mouse-dragged)
+  (add-watch points nil
+             (fn [_ _ _ new-points]
+               (points-changed new-points))))
 
 #_(run)
