@@ -1,2 +1,2 @@
-lein localrepo install libs/hemesh.jar wblut/hemesh 1.8
-lein localrepo install libs/quickhull3d.jar quickhull3d/quickhull3d 1.0
+mvn install:install-file -Dfile=libs/hemesh.jar -DgroupId=wblut -DartifactId=hemesh -Dversion=1.8 -Dpackaging=jar
+mvn install:install-file -Dfile=libs/quickhull3d.jar -DgroupId=quickhull3d -DartifactId=quickhull3d -Dversion=1.0 -Dpackaging=jar
