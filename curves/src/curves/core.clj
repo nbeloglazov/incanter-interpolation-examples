@@ -1,4 +1,4 @@
-(ns function-interpolation.core
+(ns curves.core
   (:require [quil.core :refer :all]
             [quil.helpers.drawing :refer (line-join-points)]
             [incanter.interpolation :refer (interpolate approximate)]))
@@ -191,4 +191,4 @@
              (fn [_ _ _ new-points]
                (points-changed new-points))))
 
-#_(run)
+(run)
