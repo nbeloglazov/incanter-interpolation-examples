@@ -6,6 +6,8 @@
 (def mesh (atom nil))
 (def render (atom render))
 
+(def parts 50)
+
 (defn create-surface-mesh [f [u-l u-u] [v-l v-u]]
   (let [surface (proxy [wblut.geom.WB_Surface] []
                   (loweru [] u-l)
@@ -15,7 +17,7 @@
                   (surfacePoint [u v]
                     (let [[x y z] (f u v)]
                       (wblut.geom.WB_Point3d. (double x) (double y) (double z)))))]
-    (wblut.hemesh.HE_Mesh. (wblut.hemesh.HEC_FromSurface. surface 50 50 false false))))
+    (wblut.hemesh.HE_Mesh. (wblut.hemesh.HEC_FromSurface. surface parts parts false false))))
 
 (defn rand-grid [n m]
   (let [grid (repeatedly n #(repeatedly m (fn [] (/ (rand) 2))))
@@ -29,7 +31,7 @@
 
 
 
-(def ggrid (rand-grid 7 7))
+(def ggrid (rand-grid 7 8))
 
 (def interp
   #_(approximate-grid ggrid :degree 1)
