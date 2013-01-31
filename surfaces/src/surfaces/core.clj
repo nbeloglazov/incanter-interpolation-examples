@@ -31,7 +31,9 @@
 
 (def ggrid (rand-grid 7 7))
 
-(def interp (interpolate-grid ggrid :bicubic-spline))
+(def interp
+  #_(approximate-grid ggrid :degree 1)
+  (interpolate-grid ggrid :bicubic-spline))
 
 (defn surface-f [u v]
   [u v (interp (+ u 0.5) (+ v 0.5))])
@@ -69,7 +71,7 @@
     (stroke 255 0 0)
     (doseq [i (range n)
             j (range m)]
-      (point (xs j) (ys i) (get-in ggrid [j i])))
+      (point (xs j) (ys i) (get-in ggrid [i j])))
     (stroke-weight 1)))
 
 (defn draw []
