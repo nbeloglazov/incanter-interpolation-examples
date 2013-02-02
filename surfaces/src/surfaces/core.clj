@@ -6,6 +6,10 @@
 (def mesh (atom nil))
 (def render (atom render))
 (def type (atom :surface))
+(def n (atom 7))
+(def m (atom 8))
+(def cur-x (atom 0))
+(def cur-y (atom 0))
 
 (def parts 50)
 
@@ -30,9 +34,7 @@
         grid (assoc-in grid [(dec n)] (first grid))]
     grid))
 
-
-
-(def ggrid (rand-grid 7 8))
+(def ggrid (rand-grid @n @m))
 
 (def interp
   #_(approximate-grid ggrid :degree 1)
@@ -67,21 +69,36 @@
         m (count (first ggrid))
         xs (vec (uniform-split [-0.5 0.5] m))
         ys (vec (uniform-split [-0.5 0.5] n))]
-    (stroke-weight 5)
-    (stroke 255 0 0)
+    (stroke-weight 7)
     (doseq [i (range n)
             j (range m)]
+      (if (and (= i @cur-y) (= j @cur-x))
+        (stroke 255 0 0)
+        (stroke 0 0 255))
       (let [p [(xs j) (ys i) (get-in ggrid [i j])]]
         (if (= :surface @type)
           (apply point p)
           (apply point (as-spherical p)))))
     (stroke-weight 1)))
 
+(defn move-current-selection [dx dy]
+  (swap! cur-x #(constrain (+ dx %) 0 (dec @m)))
+  (swap! cur-y #(constrain (+ dy %) 0 (dec @n))))
+
+(def space (keyword " "))
+
+(defn key-pressed []
+  (let [key (key-as-keyword)]
+    (cond (= key :left) (move-current-selection 1 0)
+          (= key :right) (move-current-selection -1 0)
+          (= key :up) (move-current-selection 0 1)
+          (= key :down) (move-current-selection 0 -1))))
+
 (defn draw []
   (lights)
   (background 120)
   (push-matrix)
-  (translate 400 400)
+  (translate (/ (width) 2) (/ (height) 2))
   (scale 300)
   (rotate-y (* (mouse-x) (/ 1.0 (width)) TWO-PI))
   (rotate-x (* (mouse-y) (/ 1.0 (height)) TWO-PI))
@@ -107,4 +124,5 @@
   :setup setup
   :renderer :p3d
   :draw draw
+  :key-pressed key-pressed
   :size [800 800])
