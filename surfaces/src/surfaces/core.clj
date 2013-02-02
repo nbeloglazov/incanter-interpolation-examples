@@ -5,6 +5,7 @@
 
 (def mesh (atom nil))
 (def render (atom render))
+(def type (atom :surface))
 
 (def parts 50)
 
@@ -20,7 +21,7 @@
     (wblut.hemesh.HE_Mesh. (wblut.hemesh.HEC_FromSurface. surface parts parts false false))))
 
 (defn rand-grid [n m]
-  (let [grid (repeatedly n #(repeatedly m (fn [] (/ (rand) 2))))
+  (let [grid (repeatedly n #(repeatedly m rand))
         grid (mapv vec grid)
         grid (reduce (fn [gr i]
                        (assoc-in gr [i (dec m)] (get-in gr [i 0])))
@@ -39,23 +40,20 @@
 
 (defn surface-f [u v]
   [u v (interp (+ u 0.5) (+ v 0.5))])
-(defn sphere-f [u v]
-  (let [r (interp (+ u 0.5) (+ v 0.5))
-        r (+ 0.5 (/ r 2))
-        u (* TWO-PI (+ u 0.5))
-        v (* TWO-PI v)]
-    [(* (cos v) (cos u) r)
-     (* (cos v) (sin u) r)
-     (* (sin v) r)]))
 
-#_(defn f [u v]
-  (let [r (+ 0.5 (/ u TWO-PI))]
+(defn as-spherical [[x y z]]
+  (let [r (+ 0.2 (* z 0.8))
+        u (* TWO-PI (+ x 0.5))
+        v (* TWO-PI y)]
     [(* (cos v) (cos u) r)
      (* (cos v) (sin u) r)
      (* (sin v) r)]))
 
 (defn setup []
-  (reset! mesh (create-surface-mesh surface-f [-0.5 0.5] [-0.5 0.5]))
+  (let [surface-fn (if (= :surface @type)
+                     surface-f
+                     (comp as-spherical surface-f))]
+    (reset! mesh (create-surface-mesh surface-fn [-0.5 0.5] [-0.5 0.5])))
   (reset! render (wblut.processing.WB_Render. (current-applet))))
 
 (defn uniform-split [[from to] n]
@@ -64,7 +62,7 @@
        (map #(* % (- to from)))
        (map #(+ from %))))
 
-(defn draw-grid []
+(defn draw-points []
   (let [n (count ggrid)
         m (count (first ggrid))
         xs (vec (uniform-split [-0.5 0.5] m))
@@ -73,7 +71,10 @@
     (stroke 255 0 0)
     (doseq [i (range n)
             j (range m)]
-      (point (xs j) (ys i) (get-in ggrid [i j])))
+      (let [p [(xs j) (ys i) (get-in ggrid [i j])]]
+        (if (= :surface @type)
+          (apply point p)
+          (apply point (as-spherical p)))))
     (stroke-weight 1)))
 
 (defn draw []
@@ -89,7 +90,7 @@
   (.drawFaces @render @mesh)
   (stroke 0)
   (.drawEdges @render @mesh)
-  (draw-grid)
+  (draw-points)
   #_(do (stroke-weight 10)
       (stroke 255 0 0)
       (line 0 0 0 1 0 0)
@@ -98,7 +99,6 @@
       (stroke 0 0 255)
       (line 0 0 0 0 0 1)
       (stroke-weight 1))
-  
   (pop-matrix))
 
 
