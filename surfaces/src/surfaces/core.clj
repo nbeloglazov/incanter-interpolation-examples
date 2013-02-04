@@ -156,14 +156,14 @@
 
 (defn draw-stats []
   (push-matrix)
-  (translate 0 10)
+  (translate 200 10)
   (let [in-progress (into @in-progress @in-queue)
         done (remove in-progress all-types)]
     (fill 0)
     (text-size 20)
     (text (build-string "Done" done) 20 20 0)
     (text (build-string "In progress" in-progress) 20 40 0))
-  (translate 0 80)
+  (translate -200 20)
   (text "Types:" 20 0 0)
   (doseq [[type i] (indexed all-types)]
     (apply fill (colors type))
@@ -230,8 +230,8 @@
         :r (recalculate-meshes-async true)
         :o (recalculate-meshes-async false)
         :d (regenerate-grid :random)
-        :f (regenerate-grid :flat)))))
-
+        :f (regenerate-grid :flat)
+        :default))))
 
 (defsketch example
   :title "Surfaces"
@@ -239,4 +239,4 @@
   :renderer :p3d
   :draw draw
   :key-pressed key-pressed
-  :size [800 800])
+  :size [1200 1200])
