@@ -100,7 +100,7 @@
     (recur queue)))
 
 (defn start-workers []
-  (dotimes [_ (dec (.. Runtime getRuntime availableProcessors))]
+  (dotimes [_ (max 1 (dec (.. Runtime getRuntime availableProcessors)))]
     (future (process-job queue))))
 
 (defn recalculate-meshes-async [all?]
