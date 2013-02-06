@@ -199,7 +199,15 @@
   (swap! cur-y #(constrain (+ dy %) 0 (dec @n))))
 
 (defn change-grid [i j delta]
-  (swap! grid update-in [i j] #(constrain (+ % delta) 0 max-z)))
+  (swap! grid update-in [i j] #(constrain (+ % delta) 0 max-z))
+  (when (or (= 0 i) (= (dec @n) i))
+    (swap! grid assoc-in [(- @n i 1) j] (get-in @grid [i j])))
+  (when (or (= 0 j) (= (dec @m) j))
+    (swap! grid assoc-in [i (- @m j 1)] (get-in @grid [i j])))
+  (when (and (or (= 0 i) (= (dec @n) i))
+             (or (= 0 j) (= (dec @m) j)))
+    (swap! grid assoc-in [(- @n i 1) (- @m j 1)] (get-in @grid [i j])))
+  (recalculate-meshes-async false))
 
 (defn toggle [set value]
   ((if (set value) disj conj) set value))
