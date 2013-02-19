@@ -2,7 +2,8 @@
   (:require [quil.core :refer :all]
             [quil.applet :refer [current-applet]]
             [incanter.interpolation :refer :all]
-            [clojure.string :as string]))
+            [clojure.string :as string])
+  (:gen-class))
 
 (defn col [val]
   (map #(bit-and 0xFF %)
@@ -10,12 +11,12 @@
         (bit-shift-right val 8)
         val]))
 
-(def parts 50)
+(def parts 70)
 (def max-z 0.5)
 (def render (atom render))
 (def s-type (atom :surface))
-(def n (atom 7))
-(def m (atom 7))
+(def n (atom 10))
+(def m (atom 10))
 (def cur-x (atom 0))
 (def cur-y (atom 0))
 (def grid (atom nil))
@@ -241,10 +242,20 @@
         :f (regenerate-grid :flat)
         :default))))
 
-(defsketch example
-  :title "Surfaces"
-  :setup setup
-  :renderer :p3d
-  :draw draw
-  :key-pressed key-pressed
-  :size [1200 1200])
+(defn exit-on-close [sketch]
+  (let [frame (-> sketch .getParent .getParent .getParent .getParent)]
+    (.setDefaultCloseOperation frame javax.swing.JFrame/EXIT_ON_CLOSE)))
+
+
+(defn run []
+ (exit-on-close
+  (sketch
+   :title "Surfaces"
+   :setup setup
+   :renderer :p3d
+   :draw draw
+   :key-pressed key-pressed
+   :size [1200 1200])))
+
+(defn -main [& args]
+  (run))

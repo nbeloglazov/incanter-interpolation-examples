@@ -4,7 +4,8 @@
             [seesaw.chooser :refer (choose-file)]
             [incanter.interpolation :refer (interpolate-grid approximate-grid)]
             [clojure.java.io :refer (resource)])
-  (:import java.awt.Color))
+  (:import java.awt.Color)
+  (:gen-class))
 
 (def image (atom nil))
 (def image-name (atom "sky.png"))
@@ -46,8 +47,8 @@
   (let [rgb (map int (map #(constrain % 0 255) rgb))]
    (.getRGB (Color. (first rgb) (second rgb) (last rgb)))))
 
-(def converter {:to-coll to-rgb
-                :from-coll rgb-to-rgb-int})
+(def converter {:to-coll to-hsb
+                :from-coll hsb-to-rgb-int})
 
 (defn to-grid [image]
   (let [n (.getHeight image)
@@ -233,7 +234,7 @@
   (invoke-later
     (reset! root (-> (frame :title @image-name,
                             :content (get-layout)
-                            :on-close :dispose
+                            :on-close :exit
                             :resizable? false)
                      pack!
                      show!))
@@ -241,7 +242,6 @@
     (set-image nil))
   (start-workers))
 
-(-main)
 
 
 

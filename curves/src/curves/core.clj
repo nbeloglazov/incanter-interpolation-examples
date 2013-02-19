@@ -1,7 +1,8 @@
 (ns curves.core
   (:require [quil.core :refer :all]
             [quil.helpers.drawing :refer (line-join-points)]
-            [incanter.interpolation :refer (interpolate approximate)]))
+            [incanter.interpolation :refer (interpolate approximate)])
+  (:gen-class))
 
 (defn col [val]
   (map #(bit-and 0xFF %)
@@ -114,7 +115,6 @@
   [(mouse-x) (mouse-y)])
 
 (defn mouse-clicked []
-  (println "Mouse clicked")
   (if-let [id (find-checkbox (mouse-point))]
     (do (swap! checkboxes update-in [id] not)
         (when (= id :parametric)
@@ -124,7 +124,6 @@
          (mouse-point))))
 
 (defn mouse-pressed []
-  (println "Mouse pressed")
   (let [mouse (mouse-point)]
     (reset! base-mouse-point mouse)
     (reset! dragged-point (find-last-point @points mouse))))
@@ -178,7 +177,14 @@
 (defn setup []
   (frame-rate 5))
 
+(defn exit-on-close [sketch]
+  (let [frame (-> sketch .getParent .getParent .getParent .getParent)]
+    (.setDefaultCloseOperation frame javax.swing.JFrame/EXIT_ON_CLOSE)))
+
 (defn run []
+  (add-watch points nil
+             (fn [_ _ _ new-points]
+               (points-changed new-points)))
   (sketch
    :title "Function interpolation"
    :setup setup
@@ -186,9 +192,7 @@
    :size [800 600]
    :mouse-clicked mouse-clicked
    :mouse-pressed mouse-pressed
-   :mouse-dragged mouse-dragged)
-  (add-watch points nil
-             (fn [_ _ _ new-points]
-               (points-changed new-points))))
+   :mouse-dragged mouse-dragged))
 
-(run)
+(defn -main [& args]
+  (exit-on-close (run)))
