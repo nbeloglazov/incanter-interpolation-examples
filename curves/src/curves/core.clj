@@ -25,13 +25,15 @@
 (def checkboxes (atom (into {} [[:parametric false ]
                                 [:linear true]
                                 [:polynomial false]
-                                [:cubic-spline false]
+                                [:cubic-spline-natural false]
+                                [:cubic-spline-closed false]
                                 [:b-spline false]])))
 
 (def checkbox-text {:parametric "Parametric function"
                     :linear "Linear"
                     :polynomial "Polynomial"
-                    :cubic-spline "Cubic spline"
+                    :cubic-spline-natural "Cubic spline natural"
+                    :cubic-spline-closed "Cubic spline closed"
                     :b-spline "B-spline 3 order"})
 
 (def work-future (atom (future)))
@@ -41,19 +43,22 @@
 (def colors {:parametric (col 0)
              :linear (col 0x9BBB59)
              :polynomial (col 0x8064A2)
-             :cubic-spline (col 0x4BACC6)
+             :cubic-spline-natural (col 0x4BACC6)
+             :cubic-spline-closed (col 0xC0504D)
              :b-spline (col 0xF79646)})
 
 (def interpolators
   (assoc (into {}
-               (for [type [:linear :polynomial :cubic-spline]]
+               (for [type [:linear :polynomial]]
                  [type #(interpolate % type)]))
     :b-spline (fn [points]
                 (let [min (first (first points))
                       max (first (last points))
                       approximator (approximate (map second points))]
                   (fn [x]
-                    (approximator (/ (- x min) (- max min))))))))
+                    (approximator (/ (- x min) (- max min))))))
+    :cubic-spline-natural #(interpolate % :cubic-spline :boundaries :natural)
+    :cubic-spline-closed #(interpolate % :cubic-spline :boundaries :closed)))
 
 (defn get-plot-xs [points-xs]
   (let [min (first points-xs)
@@ -71,7 +76,7 @@
           xs (get-plot-xs (map first points))]
       (swap! curves empty)
       (doseq [type (keys interpolators)]
-        (when-not (and (= type :cubic-spline)
+        (when-not (and (#{:cubic-spline-natural :cubic-spline-closed} type)
                        (< (count points) 3))
           (let [ps (map ((interpolators type) points) xs)
                 ps (if parametric? ps (map vector xs ps))]

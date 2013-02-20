@@ -27,12 +27,14 @@
 
 (def meshes {:bilinear (atom nil)
              :polynomial (atom nil)
-             :bicubic-spline (atom nil)
+             :bicubic-spline-natural (atom nil)
+             :bicubic-spline-closed (atom nil)
              :b-spline (atom nil)})
 
 (def colors {:bilinear (col 0x9BBB59)
              :polynomial (col 0x8064A2)
-             :bicubic-spline (col 0x4BACC6)
+             :bicubic-spline-natural (col 0x4BACC6)
+             :bicubic-spline-closed (col 0xC0504D)
              :b-spline (col 0xF79646)})
 
 (def all-types (keys meshes))
@@ -83,8 +85,10 @@
      (* (sin v) r)]))
 
 (defn interpolate-grid-by-type [type]
-  (if (= type :b-spline)
-    (approximate-grid @grid)
+  (case type
+    :b-spline (approximate-grid @grid)
+    :bicubic-spline-natural (interpolate-grid @grid :bicubic-spline :boundaries :natural)
+    :bicubic-spline-closed (interpolate-grid @grid :bicubic-spline :boundaries :closed)
     (interpolate-grid @grid type)))
 
 (defn recalculate-mesh [type]
@@ -234,8 +238,9 @@
         :z (change-grid @cur-y @cur-x -0.1)
         :1 (toggle-active :bilinear)
         :2 (toggle-active :polynomial)
-        :3 (toggle-active :bicubic-spline)
-        :4 (toggle-active :b-spline)
+        :3 (toggle-active :bicubic-spline-natural)
+        :4 (toggle-active :bicubic-spline-closed)
+        :5 (toggle-active :b-spline)
         :r (recalculate-meshes-async true)
         :o (recalculate-meshes-async false)
         :d (regenerate-grid :random)
@@ -248,14 +253,13 @@
 
 
 (defn run []
- (exit-on-close
   (sketch
    :title "Surfaces"
    :setup setup
    :renderer :p3d
    :draw draw
    :key-pressed key-pressed
-   :size [1200 1200])))
+   :size [1200 1200]))
 
 (defn -main [& args]
-  (run))
+  (exit-on-close (run)))
