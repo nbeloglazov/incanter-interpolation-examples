@@ -1,6 +1,6 @@
 \section{Интерполяция функции 1 переменной}
 
-Рассмотрим набор попарно различных точек $\{x_i\}_{i=0}^n, x_i \in [a, b]$. Пусть $\{y_i\}_{i=0}^n$- значения некоторой функции $f:[a,b] \to \mathbb{R}$: в этих точках: $y_i = f(x_i)$. Предполагается, что сама функция $f$ не известна, а известны только её значения в точках $x_i$. Задача интерполяции функции 1 переменной - построить функцию $\varphi : [a, b] \to \mathbb{R}$, такую что выполняются следующие условия: $\varphi(x_i) = y_i$. Т.е. построенная функция $\varphi$ должна совпадать с неизвестной функцией $f$ в заданном наборе узлов. Далее будут рассмотрены 3 способа построения функции $\varphi$: линейный, полиномиальный и кубическая интерполяция. Также будут рассмотрены B-сплайны, которые не интерполируют функцию, а приближают её.
+Рассмотрим набор попарно различных точек $\{x_i\}_{i=0}^n, x_i \in [a, b]$. Пусть $\{y_i\}_{i=0}^n$- значения некоторой функции $f \colon [a,b] \to \mathbb{R}$: в этих точках: $y_i = f(x_i)$. Предполагается, что сама функция $f$ не известна, а известны только её значения в точках $x_i$. Задача интерполяции функции 1 переменной - построить функцию $\varphi \colon [a, b] \to \mathbb{R}$, такую что выполняются следующие условия: $\varphi(x_i) = y_i$. Т.е. построенная функция $\varphi$ должна совпадать с неизвестной функцией $f$ в заданном наборе узлов. Далее будут рассмотрены 3 способа построения функции $\varphi$: линейный, полиномиальный и кубическая интерполяция. Также будут рассмотрены B-сплайны, которые не интерполируют функцию, а приближают её.
 
 \subsection{Линейная интерполяция}
 
@@ -9,7 +9,7 @@
   \varphi(x) = y_i + (y_{i+1} - y_i) \frac{x-x_i}{x_{i+1} - x_i}, x\in [x_i, x_{i+1}]
 \end{equation}
 
-\noindent Преимущества:
+\subsubsection{Преимущества:}
 \begin{itemize}
 \item простота реализации;
 
@@ -18,19 +18,19 @@
 \item высокая скорость вычисления $\varphi(x)$;
 \end{itemize}
 
-\noindent Недостатки:
+\subsubsection{Недостатки:}
 
 \begin{itemize}
 \item $\varphi$ не является непрерывно-дифферецируемой;
 \end{itemize}
 
-\noindent Временная сложность метода:
+\subsubsection{Временная сложность метода:}
 
 Построение $\varphi$: $ O(n \log n)$ - требуется отсортировать все узлы.
 
 Вычисление $\varphi(x)$: $O(\log n)$ - поиск соответствующего узла.
 
-\subsubsection{Пример}
+\subsubsection{Пример:}
 
 \begin{minted}{clojure}
   ; define points
@@ -39,11 +39,148 @@
   ; build interpolation function
   (def lin (interpolate points :linear))
 
-  ; view plot on [0, 1]
+  ; view plot on [0, 11]
   (view (function-plot lin 0 11))
 \end{minted}
 
 \imagefit{linear_interpolation_1_var}
+
+
+\subsection{Полиномиальная интерполяция}
+
+В данном способе интерполяции $\varphi$ является многочленом степени $n$. Для построение $\varphi$ используется формула Ньютона с разделёнными разностями. Вычисления производятся по следующим формулам:
+
+\begin{equation}
+  \begin{gathered}
+    \varphi(x) = \sum_{i=0}^n f[x_0, \dotsc, x_i] \omega_i(x) \\
+    \omega_i(x) = (x - x_0)(x - x_1) \dotsc (x - x_i) \\
+    f[x_0, \dotsc, x_i] = \frac{f[x_1, \dotsc, x_i] - f[x_0, \dotsc, x_{i-1}]}{x_i - x_0}, \forall i \geq 1 \\
+    f[x_j] = f(x_j), \forall j
+  \end{gathered}
+\end{equation}
+
+\subsubsection{Преимущества:}
+
+\begin{itemize}
+\item $\varphi$ имеет производную любого порядка;
+\end{itemize}
+
+\subsubsection{Недостатки:}
+
+\begin{itemize}
+\item при больших $n$ интерполяционный многочлен будет иметь большую погрешность интерполирования;
+\item низкая скорость построениpе $\varphi$;
+\item низкая скорость вычисления $\varphi(x)$;
+\end{itemize}
+
+\subsubsection{Временная сложность метода:}
+
+Построение $\varphi$: $O(n^2)$
+
+Вычисление $\varphi(x)$: $O(n)$
+
+\subsubsection{Пример:}
+
+\begin{minted}{clojure}
+  ; define points
+  (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+
+  ; build interpolation function
+  (def polynom (interpolate points :polynomial))
+
+  ; view plot on [0, 11]
+  (view (function-plot polynom 0 11))
+\end{minted}
+
+\imagefit{polynomial_interpolation_1_var}
+
+
+\subsection{Кубический сплайн}
+
+Функция $\varphi$ является кусочной и на каждом отрезке $[x_{i-1},x_i], i=\overline{1,n}$ задаётся отдельным кубическим многочленом:
+\begin{equation}
+  \varphi(x) = s_i(x) = \alpha_i + \beta_i(x - x_i) + \frac{\delta_i}{2}(x - x_i)^2 + \frac{\delta_i}{6}(x - x_i)^3, x \in [x_{i-1}, x_i]
+\end{equation}
+
+Также накладываются требования наличия непрерывной первой и второй производной $\varphi$, из чего получаем дополнительные условия:
+
+\begin{equation}
+  \begin{gathered}
+    s'_{i-1}(x_{i-1}) = s'_i(x_{i-1}), i = \overline{2, n} \\
+    s''_{i-1}(x_{i-1}) = s''_i(x_{i-1}), i = \overline{2, n}
+  \end{gathered}
+\end{equation}
+
+Используя эти условия и условия интерполяции получаем следующие формулы для вычисления коэффициентов $\{\alpha_i\}$, $\{\beta_i\}$, $\{\delta_i\}$:
+
+\begin{equation}
+  \begin{gathered}
+    h_i = x_i - x_{i-1}, i = \overline{1, n} \\
+    \alpha_i = y_i, i = \overline{0, n} \\
+    \beta_i = \frac{y_i - y_{i-1}}{h_i} + \frac{2\gamma_i + \gamma_{i - 1}}{6}, i = \overline{1, n} \\
+    \delta_i = \frac{\gamma_i - \gamma_{i-1}}{h_i}, i = \overline{2, n}
+  \end{gathered}
+\end{equation}
+
+Коэффициенты $\{\delta_i\}$ можно получить, решив следующую 3-диагональную систему линейных уравненией:
+
+\begin{equation}
+  h_i \gamma_{i-1} + 2(h_i + h_{i+1})\gamma_i + h_{i+1}\gamma_{i+1} =
+  6 (\frac{y_{i+1} - y_i}{h_{i-1}} - \frac{y_i - y_{i-1}}{h_i}), i = \overline{i, n - 1}
+\end{equation}
+
+Данная система имеет $n-2$ уравнений и $n$ неизвестных. Задавая различные граничные условия можно получить недостающие уравнения и решить систему, тем самым получая коэффициенты для кубического сплайна. Были реализованы 2 вида граничных условий:
+
+\begin{enumerate}
+\item Естественные граничные условия. Полагают $\varphi''(x_0)= \varphi''(x_n)=0$.
+\item Периодические (замкнутые) граничные условия. Полагают $\varphi'(x_0)=\varphi'(x_n),\, \varphi''(x_0)=\varphi''(x_n)$.
+\end{enumerate}
+
+\subsubsection{Временная сложность метода:}
+
+Построение $\varphi$: $O(n)$
+
+Вычисление $\varphi(x)$: $O(\log n)$ - поиск соответствующего промежутка.
+
+\subsubsection{Пример:}
+
+\begin{minted}{clojure}
+  ; define points
+  (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+
+  ; build interpolation function
+  (def cubic (interpolate points :cubic-spline :boundaries :closed))
+
+  ; view plot on [0, 11]
+  (view (function-plot cubic 0 11))
+\end{minted}
+
+\imagefit{cubic_interpolation_1_var}
+
+
+\subsection{B-сплайн}
+
+B-сплайны не интерполируют узлы, как ранее расмотренные методы, а приближают их. При построении B-сплайновой кривой узлы $\{x_i\}$ обычно не задаются, они вычисляются в процессе построения кривой. Задаются только значения $\{y_i\}$.
+
+\subsubsection{Временная сложность метода:}
+
+Построение $\varphi$: $O(n)$
+
+Вычисление $\varphi(t)$: $O(d^2)$, где $d$ - степень сплайна
+
+
+\begin{minted}{clojure}
+  ; define points
+  (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+
+  ; build approximation function
+  (def b-spline (approximate points :degree 3))
+
+  ; view plot on [0, 1]
+  (view (parametric-plot cubic 0 1))
+\end{minted}
+
+\imagefit{b_spline_approximation_1_var}
 
 %%% Local Variables:
 %%% mode: latex
