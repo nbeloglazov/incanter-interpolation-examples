@@ -6,6 +6,8 @@
 \usepackage[russian]{babel}
 
 \usepackage{graphicx} % для вставки картинок
+\graphicspath{ {img/} }
+
 \usepackage{amssymb,amsfonts,amsmath,amsthm} % математические дополнения от АМС
 \usepackage{indentfirst} % отделять первую строку раздела абзацным отступом тоже
 \usepackage[usenames,dvipsnames]{color} % названия цветов
@@ -31,7 +33,7 @@
 \fancypagestyle{plain}{
   \fancyhf{}
   \rhead{\thepage}}
-\setcounter{page}{5} % начать нумерацию страниц с №5
+\setcounter{page}{1} % начать нумерацию страниц с №5
 
 
 % Поля
@@ -40,3 +42,8 @@
 \geometry{right=1.5cm}
 \geometry{top=2.4cm}
 \geometry{bottom=2.4cm}
+
+\renewcommand\thesection{\arabic{section}} % Start sections from 1 not 0.1
+
+\usepackage{minted} % code highlighting
+
