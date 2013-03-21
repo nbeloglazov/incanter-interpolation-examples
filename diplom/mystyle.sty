@@ -24,7 +24,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[R]{\thepage}
+\fancyfoot[C]{\thepage}
 \fancyheadoffset{0mm}
 \fancyfootoffset{0mm}
 \setlength{\headheight}{17pt}
@@ -47,3 +47,5 @@
 
 \usepackage{minted} % code highlighting
 
+\newcommand{\imagefit}[1]{
+  \centerline{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{#1}}}
