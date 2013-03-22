@@ -1,7 +1,7 @@
 (ns curves.core
   (:require [quil.core :refer :all]
             [quil.helpers.drawing :refer (line-join-points)]
-            [incanter.interpolation :refer (interpolate approximate)])
+            [incanter.interpolation :refer (interpolate approximate interpolate-parametric)])
   (:gen-class))
 
 (defn col [val]
@@ -47,18 +47,18 @@
              :cubic-spline-closed (col 0xC0504D)
              :b-spline (col 0xF79646)})
 
-(def interpolators
-  (assoc (into {}
-               (for [type [:linear :polynomial]]
-                 [type #(interpolate % type)]))
-    :b-spline (fn [points]
-                (let [min (first (first points))
-                      max (first (last points))
-                      approximator (approximate (map second points))]
-                  (fn [x]
-                    (approximator (/ (- x min) (- max min))))))
-    :cubic-spline-natural #(interpolate % :cubic-spline :boundaries :natural)
-    :cubic-spline-closed #(interpolate % :cubic-spline :boundaries :closed)))
+(def types (-> colors keys set (disj :parametric)))
+
+(def interpolator
+  (memoize
+   (fn [type parametric?]
+     (let [interp (if parametric? interpolate-parametric interpolate)]
+       (case type
+         :linear #(interp % :linear)
+         :polynomial #(interp % :polynomial)
+         :cubic-spline-natural #(interp % :cubic-spline :boundaries :natural)
+         :cubic-spline-closed #(interp % :cubic-spline :boundaries :closed)
+         :b-spline approximate)))))
 
 (defn get-plot-xs [points-xs]
   (let [min (first points-xs)
@@ -72,14 +72,22 @@
 
 (defn recalculate-curves [points parametric?]
   (when (> (count points) 1)
-    (let [points (if parametric? (indexed points) (sort-by first points))
-          xs (get-plot-xs (map first points))]
+    (let [points (if parametric? points (sort-by first points))]
       (swap! curves empty)
-      (doseq [type (keys interpolators)]
+      (doseq [type types]
         (when-not (and (#{:cubic-spline-natural :cubic-spline-closed} type)
                        (< (count points) 3))
-          (let [ps (map ((interpolators type) points) xs)
-                ps (if parametric? ps (map vector xs ps))]
+          (let [xs (get-plot-xs
+                    (if (or parametric?
+                            (= type :b-spline))
+                      [0 1]
+                      (map first points)))
+                ps (map ((interpolator type parametric?) points) xs)
+                ps (if (or parametric?
+                           (= type :b-spline))
+                     ps
+                     (map vector xs ps))]
+            (println "First ps" (first ps))
             (swap! curves assoc type (line-join-points ps))))))))
 
 (defn points-changed [points]
