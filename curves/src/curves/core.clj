@@ -1,7 +1,7 @@
 (ns curves.core
   (:require [quil.core :refer :all]
             [quil.helpers.drawing :refer (line-join-points)]
-            [incanter.interpolation :refer (interpolate approximate interpolate-parametric)])
+            [incanter.interpolation :refer (interpolate approximate-parametric interpolate-parametric)])
   (:gen-class))
 
 (defn col [val]
@@ -58,7 +58,7 @@
          :polynomial #(interp % :polynomial)
          :cubic-spline-natural #(interp % :cubic-spline :boundaries :natural)
          :cubic-spline-closed #(interp % :cubic-spline :boundaries :closed)
-         :b-spline approximate)))))
+         :b-spline approximate-parametric)))))
 
 (defn get-plot-xs [points-xs]
   (let [min (first points-xs)
@@ -87,7 +87,6 @@
                            (= type :b-spline))
                      ps
                      (map vector xs ps))]
-            (println "First ps" (first ps))
             (swap! curves assoc type (line-join-points ps))))))))
 
 (defn points-changed [points]
