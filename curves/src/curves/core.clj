@@ -27,6 +27,7 @@
                                 [:polynomial false]
                                 [:cubic-spline-natural false]
                                 [:cubic-spline-closed false]
+                                [:cubic-hermite-spline false]
                                 [:b-spline false]])))
 
 (def checkbox-text {:parametric "Parametric function"
@@ -34,6 +35,7 @@
                     :polynomial "Polynomial"
                     :cubic-spline-natural "Cubic spline natural"
                     :cubic-spline-closed "Cubic spline closed"
+                    :cubic-hermite-spline "Cubic hermite spline"
                     :b-spline "B-spline 3 order"})
 
 (def work-future (atom (future)))
@@ -45,6 +47,7 @@
              :polynomial (col 0x8064A2)
              :cubic-spline-natural (col 0x4BACC6)
              :cubic-spline-closed (col 0xC0504D)
+             :cubic-hermite-spline (col 0x1F497D)
              :b-spline (col 0xF79646)})
 
 (def types (-> colors keys set (disj :parametric)))
@@ -58,6 +61,7 @@
          :polynomial #(interp % :polynomial)
          :cubic-spline-natural #(interp % :cubic-spline :boundaries :natural)
          :cubic-spline-closed #(interp % :cubic-spline :boundaries :closed)
+         :cubic-hermite-spline #(interp % :cubic-hermite-spline)
          :b-spline approximate-parametric)))))
 
 (defn get-plot-xs [points-xs]
