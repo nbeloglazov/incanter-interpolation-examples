@@ -2,7 +2,7 @@
   (:require [seesaw.core :refer :all]
             [seesaw.mig :refer :all]
             [seesaw.chooser :refer (choose-file)]
-            [incanter.interpolation :refer (interpolate-grid approximate-grid)]
+            [incanter.interpolation :refer (interpolate-grid)]
             [clojure.java.io :refer (resource)])
   (:import java.awt.Color)
   (:gen-class))
@@ -29,7 +29,7 @@
   (max mn (min mx v)))
 
 (defn to-hsb [rgb-int]
-  (let [color (Color. rgb-int)] 
+  (let [color (Color. rgb-int)]
       (seq (Color/RGBtoHSB (.getRed color)
                            (.getGreen color)
                            (.getBlue color)
@@ -92,10 +92,7 @@
             m (count (first grid))]
         (swap! interpolators assoc key pr)
         (println "Calculate interpolator " image-name type)
-        (deliver pr (vector-interpolator grid
-                                         (if (= :b-spline type)
-                                           #(approximate-grid %)
-                                           #(interpolate-grid % type))))
+        (deliver pr (vector-interpolator grid #(interpolate-grid % type)))
         (println "Finished calculation interpolator " image-name type)
         pr))))
 
@@ -224,7 +221,8 @@
            [(interp-type-button "Bilinear" :bilinear)]
            [(interp-type-button "Polynomial" :polynomial)]
            [(interp-type-button "Bicubic spline" :bicubic-spline)]
-           [(interp-type-button "B-spline" :b-spline) "wrap"]
+           [(interp-type-button "Bicubic hermite" :bicubic-hermite-spline)]
+           [(interp-type-button "B-surface" :b-surface) "wrap"]
            [(border-panel :preferred-size [100 :by 100]
                           :paint (fn [comp gr] (draw-image comp gr @image))
                           :id :image) "span"]]))
@@ -241,8 +239,3 @@
     (.setLocationRelativeTo @root nil)
     (set-image nil))
   (start-workers))
-
-
-
-
-

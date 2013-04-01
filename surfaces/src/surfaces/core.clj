@@ -30,14 +30,14 @@
              :bicubic-spline-natural (atom nil)
              :bicubic-spline-closed (atom nil)
              :bicubic-hermite-spline (atom nil)
-             :b-spline (atom nil)})
+             :b-surface (atom nil)})
 
 (def colors {:bilinear (col 0x9BBB59)
              :polynomial (col 0x8064A2)
              :bicubic-spline-natural (col 0x4BACC6)
              :bicubic-spline-closed (col 0xC0504D)
              :bicubic-hermite-spline (col 0x1F497D)
-             :b-spline (col 0xF79646)})
+             :b-surface (col 0xF79646)})
 
 (def all-types (keys meshes))
 
@@ -88,10 +88,8 @@
 
 (defn interpolate-grid-by-type [type]
   (case type
-    :b-spline (approximate-grid @grid)
     :bicubic-spline-natural (interpolate-grid @grid :bicubic-spline :boundaries :natural)
     :bicubic-spline-closed (interpolate-grid @grid :bicubic-spline :boundaries :closed)
-    :bicubic-hermite-spline-closed (interpolate-grid @grid :bicubic-hermite-spline)
     (interpolate-grid @grid type)))
 
 (defn recalculate-mesh [type]
@@ -244,7 +242,7 @@
         :3 (toggle-active :bicubic-spline-natural)
         :4 (toggle-active :bicubic-spline-closed)
         :5 (toggle-active :bicubic-hermite-spline)
-        :6 (toggle-active :b-spline)
+        :6 (toggle-active :b-surface)
         :r (recalculate-meshes-async true)
         :o (recalculate-meshes-async false)
         :d (regenerate-grid :random)
