@@ -158,6 +158,67 @@
 \imagefit{cubic_interpolation_1_var}
 
 
+\subsection{Кубический эрмитов сплайн}
+
+Кусочно-полиномиальная функция $\varphi$ называется эрмитовым сплайном третьей степени для $f \in C^1[a, b]$, если
+\begin{equation}
+  \begin{gathered}
+    s\mid_{x\in \Delta_i} = s_i \in \mathbb{P}_3 \\
+      s(x_i) = f(x_i) \text{ и } s'(x_i) = f'(x_i) \;\; \forall i = \overline{0,n}
+  \end{gathered}
+\end{equation}
+
+Каждая функция $s_i$ является интерполяционным многочленом Эрмита третьей степени. Вычислять его будем используя форму Ньютона:
+
+\begin{equation}
+  s_i(x) = \sum_{j=0}^3 \alpha_{ij} \omega_{ij}(x)
+\end{equation}
+
+\noindent Где
+
+\begin{equation}
+  \begin{matrix*}[l]
+    \alpha_{i0} = f(x_{i-1}) & \omega_{i0}(x) = 1\\
+    \alpha_{i1} = f'(x_{i-1}) & \omega_{i1}(x) = x - x_{i-1} \\
+    \alpha_{i2} = f[x_{i-1}, x_{i-1}, x_i] & \omega_{i2}(x) = (x - x_{i-1})^2 \\
+    \alpha_{i3} = f[x_{i-1}, x_{i-1}, x_i, x_i] & \omega_{i3}(x) =  (x - x_{i-1})^2(x-x_i)
+  \end{matrix*}
+\end{equation}
+
+\noindent Первыe производные функции в узлах $x_i$ приближались используя конечные разности:
+
+\begin{equation}
+  f'(x_i) \approx \left\{
+  \begin{array}{l l}
+    \frac{f(x_1) - f(x_0)}{x_1 - x_0} & i = 0 \\
+    \frac{1}{2}(\frac{f(x_i) - f(x_{i-1})}{x_i - x_{i-1}} + \frac{f(x_{i+1}) - f(x_i)}{x_{i+1} - x_i}) & i = \overline{1, n-1} \\
+    \frac{f(x_n) - f(x_{n-1})}{x_n - x_{n-1}} & i = n
+  \end{array}
+  \right.
+\end{equation}
+
+\subsubsection{Временная сложность метода:}
+
+Построение $\varphi$: $O(n)$
+
+Вычисление $\varphi(x)$: $O(\log n)$ - поиск соответствующего промежутка.
+
+\subsubsection{Пример:}
+
+\begin{minted}{clojure}
+  ; define points
+  (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+
+  ; build interpolation function
+  (def hermite (interpolate points :cubic-hermite-spline :boundaries :closed))
+
+  ; view plot on [0, 11]
+  (view (function-plot hermite 0 11))
+\end{minted}
+
+\imagefit{cubic_hermite_interpolation_1_var}
+
+
 \subsection{B-сплайн}
 
 B-сплайны не интерполируют узлы, как ранее расмотренные методы, а приближают их. При построении B-сплайновой кривой узлы $\{x_i\}$ обычно не задаются, они вычисляются в процессе построения кривой. Задаются только значения $\{y_i\}$.
