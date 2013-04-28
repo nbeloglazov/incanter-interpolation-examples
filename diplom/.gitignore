@@ -2,4 +2,8 @@
 *.log
 *.aux
 *.toc
+*.nav
+*.out
+*.snm
+*.vrb
 auto

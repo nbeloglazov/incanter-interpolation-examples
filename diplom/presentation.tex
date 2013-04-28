@@ -1,0 +1,52 @@
+\documentclass[russian]{beamer}
+
+\usepackage{cmap} % для кодировки шрифтов в pdf
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{minted} % code highlighting
+
+\usepackage{graphicx} % для вставки картинок
+\graphicspath{ {img/} }
+
+%\usetheme{Warsaw}
+%\usecolortheme{beaver}
+
+\title[Интерполяция]{Алгоритмы интерполяции функций.\newline Создание библиотеки на языке Clojure.}
+\author{Белоглазов Никита}
+\date{2013}
+\institute{Белорусский Государственный Университет}
+
+\begin{document}
+
+\maketitle
+%\frame{\titlepage}
+\begin{frame}
+  \frametitle{This is the first slide}
+  hello
+  \pause
+  world
+  % Content goes here
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{This is the second slide}
+  \framesubtitle{A bit more information about this}
+  % More content goes here
+  \begin{minted}{clojure}
+    ; define points
+    (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+
+    ; build interpolation function
+    (def lin (interpolate points :linear))
+
+    ; view plot on [0, 11]
+    (view (function-plot lin 0 11))
+  \end{minted}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
