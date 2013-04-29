@@ -20,28 +20,44 @@
 \begin{document}
 
 \maketitle
-%\frame{\titlepage}
-\begin{frame}
-  \frametitle{This is the first slide}
-  hello
-  \pause
-  world
-  % Content goes here
-\end{frame}
 \begin{frame}[fragile]
-  \frametitle{This is the second slide}
-  \framesubtitle{A bit more information about this}
-  % More content goes here
-  \begin{minted}{clojure}
-    ; define points
-    (def points [[0 0] [1 3] [2 0] [5 2] [6 1] [8 2] [11 1]])
+  \frametitle{Clojure}
+  \definecolor{bg}{rgb}{0.95,0.95,0.95}
+  \begin{minted}[bgcolor=bg,gobble=4,frame=single]{clojure}
+    (defn derivative [f x]
+      (let [h 0.00001]
+        (/ (- (f (+ x h))
+              (f x))
+           h)))
 
-    ; build interpolation function
-    (def lin (interpolate points :linear))
+    (defn f1 [x] x)       ; f1(x) = x
+    (defn f2 [x] (* x x)) ; f2(x) = x * x
 
-    ; view plot on [0, 11]
-    (view (function-plot lin 0 11))
+    (derivative f1 0) ; f1'(0) = 1
+    (derivative f2 0) ; f2'(0) = 0.00001
+    (derivative f2 4) ; f2'(4) = 8.00001
   \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Incanter}
+
+  \emph{Incanter} - математический R-подобный пакет для алгебраических и статистических расчётов на языке Clojure.
+
+  \begin{itemize}
+
+  \item Функции для построения графиков и визуализации данных.
+
+  \item Математические функции.
+
+  \item Статистические функции.
+
+  \item Функции для работы с матрицами и линейной алгеброй.
+
+  \item Функции обработки данных.
+
+  \item \emph{Функции построения интерполирующих функций.}
+  \end{itemize}
 \end{frame}
 
 \end{document}
