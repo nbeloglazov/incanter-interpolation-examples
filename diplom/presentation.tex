@@ -80,6 +80,22 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{API}
+  \verb+(interpolate points type & options)+ \\
+  строит $f(x) = y$, проходящая через точки $(x, y)$. \\
+
+  \vspace{1.2cm}
+
+  \verb+(interpolate-parametric points type & options)+ \\
+  строит $f(t) = (x_1, ..., x_n)$, задающая кривую, проходяющую через точки $(x_1, ..., x_n)$. \\
+
+  \vspace{1.2cm}
+
+  \verb+(interpolate-grid grid type & options)+ \\
+  строит $f(x, y) = z$, по прямоугольной сетке.
+\end{frame}
+
 \end{document}
 
 %%% Local Variables:
