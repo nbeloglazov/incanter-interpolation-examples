@@ -1,4 +1,4 @@
-\documentclass[russian]{beamer}
+\documentclass[rpussian]{beamer}
 
 \usepackage{cmap} % для кодировки шрифтов в pdf
 \usepackage[T2A]{fontenc}
@@ -11,6 +11,32 @@
 
 %\usetheme{Warsaw}
 %\usecolortheme{beaver}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+
+\newcommand\imagesthree[6]{
+  \begin{columns}[b]
+    \begin{column}{.5\textwidth}
+      \begin{center}
+        \includegraphics[width=4cm,keepaspectratio]{#1}
+        \newline
+        \scriptsize #2
+      \end{center}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{center}
+      \includegraphics[width=4cm,,keepaspectratio]{#3}
+      \newline
+      \scriptsize #4
+      \end{center}
+    \end{column}
+  \end{columns}
+  \begin{center}
+    % Hack. Don't know why image is shifted to left a bit by default.
+    \hspace*{1.2cm} \includegraphics[width=4cm,keepaspectratio]{#5}
+    \newline
+    \scriptsize #6
+  \end{center}
+}
 
 \title[Интерполяция]{Алгоритмы интерполяции функций.\newline Создание библиотеки на языке Clojure.}
 \author{Белоглазов Никита}
@@ -19,7 +45,6 @@
 
 \begin{document}
 
-\definecolor{bg}{rgb}{0.95,0.95,0.95}
 \maketitle
 \begin{frame}[fragile]
   \frametitle{Clojure}
@@ -114,6 +139,23 @@
   \end{minted}
 \end{frame}
 
+\begin{frame}
+  \frametitle{interpolate примеры}
+  \imagesthree
+  {linear_interpolation_1_var_small}{Линейная интерполяция\\ \hspace*{5cm}} % Hack need to span caption over 2 lines.
+  {lls_polynomial_3_1_var_small}{Среднеквадратичное приближение по базису $(1, x, x^2)$}
+  {lls_sin_1_var_small}{Среднеквадратичное приближение по базису $(1, x, x^2, sin(x))$}
+\end{frame}
+
+\begin{frame}
+  \frametitle{interpolate примеры}
+  \imagesthree
+  {cubic_interpolation_1_var_small}{Кубический сплайн}
+  {cubic_hermite_interpolation_1_var_small}{Кубический эрмитов сплайн}
+  {polynomial_interpolation_1_var_small}{Полиномиальная интерполяция}
+\end{frame}
+
+
 
 \begin{frame}[fragile]
   \frametitle{interpolate-parametric}
@@ -133,6 +175,21 @@
   \end{minted}
 \end{frame}
 
+\begin{frame}
+  \frametitle{interpolate-parametric примеры}
+  \imagesthree
+  {linear_parametric_interpolation_small}{Линейная интерполяция\\ \hspace*{5cm}} % Hack. Need to span caption over 2 lines.
+  {lls_polynomial_parametric_4_small}{Среднеквадратичное приближение по базису $(1, x, x^2, x^3)$}
+  {b_spline_parametric_small}{B-сплайн 3 степени}
+\end{frame}
+
+\begin{frame}
+  \frametitle{interpolate-parametric примеры}
+  \imagesthree
+  {cubic_closed_parametric_interpolation_small}{Кубический сплайн}
+  {cubic_hermite_parametric_interpolation_small}{Кубический эрмитов сплайн}
+  {polynomial_parametric_interpolation_small}{Полиномиальная интерполяция}
+\end{frame}
 
 \begin{frame}[fragile]
   \frametitle{interpolate-grid}
@@ -145,7 +202,7 @@
                [3 4 5]
                [6 7 8]])
 
-    (def bilinear (interpolate-grid grid :linear))
+    (def bilinear (interpolate-grid grid :bilinear))
 
     (bilinear    0   0) ; 0.0
     (bilinear    1   1) ; 8.0
