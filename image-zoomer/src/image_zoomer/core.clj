@@ -220,8 +220,8 @@
            [(zoom-button 8) "wrap"]
            [(interp-type-button "Bilinear" :bilinear)]
            [(interp-type-button "Polynomial" :polynomial)]
-           [(interp-type-button "Bicubic spline" :bicubic-spline)]
-           [(interp-type-button "Bicubic hermite" :bicubic-hermite-spline)]
+           [(interp-type-button "Bicubic spline" :bicubic)]
+           [(interp-type-button "Bicubic hermite" :bicubic-hermite)]
            [(interp-type-button "B-surface" :b-surface) "wrap"]
            [(border-panel :preferred-size [100 :by 100]
                           :paint (fn [comp gr] (draw-image comp gr @image))

@@ -59,9 +59,9 @@
        (case type
          :linear #(interp % :linear)
          :polynomial #(interp % :polynomial)
-         :cubic-spline-natural #(interp % :cubic-spline :boundaries :natural)
-         :cubic-spline-closed #(interp % :cubic-spline :boundaries :closed)
-         :cubic-hermite-spline #(interp % :cubic-hermite-spline)
+         :cubic-spline-natural #(interp % :cubic :boundaries :natural)
+         :cubic-spline-closed #(interp % :cubic :boundaries :closed)
+         :cubic-hermite-spline #(interp % :cubic-hermite)
          :b-spline #(interpolate-parametric % :b-spline))))))
 
 (defn get-plot-xs [points-xs]
