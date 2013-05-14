@@ -48,6 +48,7 @@
 \maketitle
 \begin{frame}[fragile]
   \frametitle{Clojure}
+  \centering Пример функции $f'(x) \approx \frac{f(x+h) - f(x)}{h}$
   \begin{minted}[bgcolor=bg,gobble=4,frame=single]{clojure}
     (defn derivative [f x]
       (let [h 0.00001]
@@ -130,8 +131,7 @@
   \begin{minted}[bgcolor=bg,gobble=4,frame=single]{clojure}
     (def points [[0 0] [1 3] [2 0] [4 2]])
 
-    (def cubic (interpolate points :cubic
-                            :boundaries :closed))
+    (def cubic (interpolate points :cubic))
 
     (cubic 0) ; 0.0
     (cubic 1) ; 3.0
