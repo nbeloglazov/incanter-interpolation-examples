@@ -23,12 +23,54 @@
 
 \subsubsection{Пример:}
 
+\begin{minted}[gobble=2]{clojure}
+  ; define grid
+  (def grid [[0 1 2]
+             [3 4 5]
+             [6 7 8]])
+
+  ; build interpolation function
+  (interpolate-grid grid :bilinear)
+\end{minted}
+
 \imagefit{bilinear_interpolation_2_var}
 
 
 \subsection{Полиномиальная интерполяция}
 
-Полиномиальная интерполяция функции 2 переменных, как и для 1-мерного случая, была реализована в форме Ньютона.
+Полиномиальная интерполяция функции 2 переменных была реализована по алгоритму, предложенному ТУТ. Матрица разделённых разностей $P$ вычисляется по следующей формуле:
+
+\begin{equation}
+  P^{(k)}_{i,j} =
+  \begin{dcases}
+    f(x_i, y_j) & \text{if  } k = 0 \\
+    \frac{P^{(k-1)}_{i,j} - P^{(k-1)}_{i-1,j}}{x_i - x_{i-k}} & \text{if  } (j \leq k - 1 \land i > k - 1) \\
+    \frac{P^{(k-1)}_{i,j} - P^{(k-1)}_{i,j-1}}{y_j - y_{j-k}} & \text{if  } (i \leq k - 1 \land j > k - 1) \\
+    \frac{P^{(k-1)}_{i,j} + P^{(k-1)}_{i-1,j-1} - P^{(k-1)}_{i,j-1} - P^{(k-1)}_{i-1,j}}{(x_i - x_{i-k})(y_j - y_{j-k})} & \text{if  } (i > k-1 \land j > k-1)
+  \end{dcases}
+\end{equation}
+
+Интерполяционный многочлен вычисляется по формуле:
+
+\begin{equation}
+  \varphi(x, y) = Y^T P X
+\end{equation}
+
+\noindent где
+
+\begin{equation}
+  \begin{gathered}
+    X =
+    \begin{pmatrix}
+      1 \\ x - x_0 \\ \vdots \\ (x - x_0)(x - x_1) \hdots (x - x_{n-1})
+    \end{pmatrix}
+    \\
+    Y =
+    \begin{pmatrix}
+      1 \\ y - y_0 \\ \vdots \\ (y - y_0)(y - y_1) \hdots (y - y_{m-1})
+    \end{pmatrix}
+  \end{gathered}
+\end{equation}
 
 \subsubsection{Временная сложность метода:}
 
@@ -38,12 +80,32 @@
 
 \subsubsection{Пример:}
 
+\begin{minted}[gobble=2]{clojure}
+  ; define grid
+  (def grid [[0 1 2]
+             [3 4 5]
+             [6 7 8]])
+
+  ; build interpolation function
+  (interpolate-grid grid :polynomial)
+\end{minted}
+
 \imagefit{polynomial_interpolation_2_var}
 
 
 \subsection{Бикубический сплайн}
 
-Аналог кубического сплайна. Основная идея заключается в том, что фиксируется одна из переменных, например $y$,и вычисляются коэффициенты кубических сплайнов по $x$. Далее по полученным коэффициентам строятся кубические сплайны, фиксируя уже переменную $x$. Полученные сплайны и используются для вычисления функции.
+Бикубический сплайн является аналогом кубического сплайна. Будем искать функцию $\varphi(x, y)$ будем искать в виде:
+
+\begin{equation} \label{eq:bicubic_gen}
+  \varphi(x, y) = \alpha_i(y) + \beta_i(y)(x - x_i) + \frac{\delta_i(y)}{y}(x - x_i)^2 + \frac{\delta_i(y)}{6}(x - x_i)^3, x \in [x_{i-1}, x_i]
+\end{equation}
+
+Здесь коэффициенты $\alpha_i(y), \beta_i(y), \delta_i(y), \gamma_i(y), i = \overline{1, n}$ являются одномерными кубическими сплайнами. Для построения функции $\varphi$ необходимо построить данные одномерные сплайны. Но для их построения не хватает значений $\alpha_i(y), \beta_i(y), \delta_i(y), \gamma_i(y)$ в узлах $y_j, j = \overline{1,m}$.
+
+Чтобы решить эту проблему зафиксируем $y = y_0$ в \eqref{eq:bicubic_gen} и получаем одномерный кубический сплайн, вычисляя коэффициенты которого находим $\alpha_i(y_0), \beta_i(y_0), \delta_i(y_0), \gamma_i(y_0), i = \overline{1, n}$. Таким образом фиксируя $y$ можно получить значения коэффициентов по всех остальных узлах. Далее по значениям коэффициентов в узлах строим сплайны $\alpha_i(y), \beta_i(y), \delta_i(y), \gamma_i(y)$.
+
+Для вычисления значения $\varphi$ в точке $(x,y)$ необходимо по $x$ определить отрезок $[x_{i-1}, x_i]$, которому принадлежит $x$. Далее требуется посчитать значения сплайнов $\alpha_i, \beta_i, \delta_i, \gamma_i$ в точке $y$. Полученные коэффициенты использовать в формуле \eqref{eq:bicubic_gen} для получения конечного результата.
 
 \subsubsection{Временная сложность метода:}
 
@@ -53,7 +115,54 @@
 
 \subsubsection{Пример:}
 
+\begin{minted}[gobble=2]{clojure}
+  ; define grid
+  (def grid [[0 1 2]
+             [3 4 5]
+             [6 7 8]])
+
+  ; build interpolation function
+  (interpolate-grid grid :bicubic)
+\end{minted}
+
 \imagefit{bicubic_interpolation_2_var}
+
+\subsection{Средневадратическое приближение}
+
+Среднеквадратическое приближение функции 2 переменных очень сильно похоже на среднеквадратическое приближения функции 1 переменной. Задаётся базис функций 2 переменных и вычисляются коэффициенты $\{\alpha_i\}$ при которых сумма расстояний от полученной поверхности до заданных точек минимальна. Положим $N \times M$ - размеры сетки, $n$ - число базисных функций. Изменяются только формулы вычисления $\gamma_{ij}$ и $\beta_i$:
+
+\begin{equation}
+  \begin{gathered}
+    \gamma_{ij} = \sum^N_{k=0}\sum^M_{l=0} \varphi_i(x_k,y_l) \varphi_j(x_k,y_l) \\
+    \beta_i = \sum^N_{k=0}\sum^M_{l=0} y_{kl} \varphi_i(x_k,y_l)
+  \end{gathered}
+\end{equation}
+
+\subsubsection{Временная сложность метода:}
+
+Построение $\varphi$: $ O(n^2NM + n^3)$ - построение матрицы коэффициентов $\gamma_{ij}$ и решение СЛАУ.
+
+Вычисление $\varphi(x)$: $O(n)$.
+
+\subsubsection{Пример:}
+
+\begin{minted}[gobble=2]{clojure}
+  ; define grid
+  (def grid [[0 1 2]
+             [3 4 5]
+             [6 7 8]])
+
+  ; basis consists of 7 funtions: 1, x, y, sin x, cos x, sin y, cos y
+  (defn basis [x y] [1 x y 
+                     (Math/sin x) (Math/cos x) 
+                     (Math/sin y) (Math/cos y)])
+
+  ; build interpolation function
+  (interpolate-grid grid :linear-least-squares
+                         :basis basis)
+\end{minted}
+
+\imagefit{lls_1_x_y_sin_sin_cos_cos}
 
 
 \subsection{B-поверхность}
