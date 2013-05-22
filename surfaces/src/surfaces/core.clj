@@ -15,8 +15,8 @@
 (def max-z 0.5)
 (def render (atom render))
 (def s-type (atom :surface))
-(def n (atom 10))
-(def m (atom 10))
+(def n (atom 7))
+(def m (atom 7))
 (def cur-x (atom 0))
 (def cur-y (atom 0))
 (def grid (atom nil))
@@ -24,20 +24,24 @@
 (def queue (java.util.concurrent.LinkedBlockingDeque.))
 (def in-queue (atom #{}))
 (def in-progress (atom #{}))
+(def draw-stats? (atom true))
+
 
 (def meshes {:bilinear (atom nil)
              :polynomial (atom nil)
              :bicubic-spline-natural (atom nil)
              :bicubic-spline-closed (atom nil)
              :bicubic-hermite (atom nil)
-             :b-surface (atom nil)})
+             :b-surface (atom nil)
+             :linear-least-squares (atom nil)})
 
 (def colors {:bilinear (col 0x9BBB59)
              :polynomial (col 0x8064A2)
              :bicubic-spline-natural (col 0x4BACC6)
              :bicubic-spline-closed (col 0xC0504D)
              :bicubic-hermite (col 0x1F497D)
-             :b-surface (col 0xF79646)})
+             :b-surface (col 0xF79646)
+             :linear-least-squares (col 0x00AA00)})
 
 (def all-types (keys meshes))
 
@@ -90,6 +94,8 @@
   (case type
     :bicubic-spline-natural (interpolate-grid @grid :bicubic :boundaries :natural)
     :bicubic-spline-closed (interpolate-grid @grid :bicubic :boundaries :closed)
+    :linear-least-squares (interpolate-grid @grid :linear-least-squares
+                                            :basis (fn [x y] [1 x y (Math/sin x) (Math/sin y) (Math/cos y) (Math/cos x)]))
     (interpolate-grid @grid type)))
 
 (defn recalculate-mesh [type]
@@ -175,14 +181,15 @@
     (apply fill (colors type))
     (text (str (inc i) ". " (name type)) 20 (+ 20 (* i 20)) 0))
   (let [shortcuts ["Keyboard shortcuts:"
-                   "1-4 - toggle different interpolators"
+                   "1-7 - toggle different interpolators"
                    "a/z - raise/lower currently selected point"
                    "left/right/up/down - move selection"
                    "r/o - regenerate all/visible surfaces"
                    "d/f - regenerate grid random/flat"
-                   "space - toggle between surface/sphere"]]
+                   "space - toggle between surface/sphere"
+                   "s - show/hide text"]]
     (fill 0)
-    (translate 0 120)
+    (translate 0 180)
     (doseq [[shortcut i] (indexed shortcuts)]
       (text shortcut 20 (* i 20))))
   (pop-matrix))
@@ -190,7 +197,7 @@
 (defn draw []
   (lights)
   (background 200)
-  (draw-stats)
+  (when @draw-stats? (draw-stats))
   (push-matrix)
   (translate (/ (width) 2) (/ (height) 2))
   (scale 500)
@@ -243,10 +250,12 @@
         :4 (toggle-active :bicubic-spline-closed)
         :5 (toggle-active :bicubic-hermite)
         :6 (toggle-active :b-surface)
+        :7 (toggle-active :linear-least-squares)
         :r (recalculate-meshes-async true)
         :o (recalculate-meshes-async false)
         :d (regenerate-grid :random)
         :f (regenerate-grid :flat)
+        :s (swap! draw-stats? not)
         :default))))
 
 (defn exit-on-close [sketch]
@@ -259,7 +268,7 @@
    :title "Surfaces"
    :setup setup
    :renderer :p3d
-   :draw draw
+   :draw #'draw
    :key-pressed key-pressed
    :size [1200 1200]))
 
