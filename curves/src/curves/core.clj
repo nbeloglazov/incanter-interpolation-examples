@@ -204,7 +204,7 @@
   (sketch
    :title "Function interpolation"
    :setup setup
-   :draw draw
+   :draw #'draw
    :size [800 600]
    :mouse-clicked mouse-clicked
    :mouse-pressed mouse-pressed
