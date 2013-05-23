@@ -6,5 +6,5 @@
                  [quickhull3d "1.0"]
                  [wblut/hemesh "1.8"]
                  [quil "1.6.0"]
-                 [incanter/incanter-interpolation "1.5.0-SNAPSHOT"]]
+                 [incanter/incanter-core "1.5.0-SNAPSHOT"]]
   :main surfaces.core)
