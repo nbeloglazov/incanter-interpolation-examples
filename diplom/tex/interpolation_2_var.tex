@@ -33,7 +33,7 @@
   (interpolate-grid grid :bilinear)
 \end{minted}
 
-\imagefit{bilinear_interpolation_2_var}
+\imagefit{bilinear_interpolation_2_var}{Билинейная интерполяция}
 
 
 \subsection{Полиномиальная интерполяция}
@@ -90,7 +90,7 @@
   (interpolate-grid grid :polynomial)
 \end{minted}
 
-\imagefit{polynomial_interpolation_2_var}
+\imagefit{polynomial_interpolation_2_var}{Полиномиальная интерполяция}
 
 
 \subsection{Бикубический сплайн}
@@ -125,7 +125,7 @@
   (interpolate-grid grid :bicubic)
 \end{minted}
 
-\imagefit{bicubic_interpolation_2_var}
+\imagefit{bicubic_interpolation_2_var}{Бикубический сплайн}
 
 \subsection{Средневадратическое приближение}
 
@@ -153,8 +153,8 @@
              [6 7 8]])
 
   ; basis consists of 7 funtions: 1, x, y, sin x, cos x, sin y, cos y
-  (defn basis [x y] [1 x y 
-                     (Math/sin x) (Math/cos x) 
+  (defn basis [x y] [1 x y
+                     (Math/sin x) (Math/cos x)
                      (Math/sin y) (Math/cos y)])
 
   ; build interpolation function
@@ -162,22 +162,36 @@
                          :basis basis)
 \end{minted}
 
-\imagefit{lls_1_x_y_sin_sin_cos_cos}
+\imagefit{lls_1_x_y_sin_sin_cos_cos}{Среднеквадратичное приближение по базису $1, x, y, sin(x), cos(x), sin(y), cos(y)$}
 
 
-\subsection{B-поверхность}
+\subsection{B-сплайновая поверхность}
 
-B-поверхность для функции двух переменных строится используя тензорное произведение B-сплайнов для одномерного случая.
+B-сплайновая поверхность для функции двух переменных строится используя тензорное произведение B-сплайнов для одномерного случая. Формула $\varphi(u, v)$ выглядит следующим образом:
+
+\begin{equation}
+  \varphi(u, v) = \sum_{i=0}^m \sum_{j=0}^n q_{ij} N^d_i(u)N^d_j(v)
+\end{equation}
 
 \subsubsection{Временная сложность метода:}
 
 Построение $\varphi$: $O(n m)$
 
-Вычисление $\varphi(x, y)$: $O(d^2)$, где $d$ - степень одномерных сплайнов.
+Вычисление $\varphi(u, v)$: $O(d^2)$, где $d$ - степень одномерных сплайнов.
 
 \subsubsection{Пример:}
 
-\imagefit{b_surface_approximation_2_var}
+\begin{minted}[gobble=2]{clojure}
+  ; define grid
+  (def grid [[0 1 2]
+             [3 4 5]
+             [6 7 8]])
+
+  ; build interpolation function
+  (interpolate-grid grid :b-surface)
+\end{minted}
+
+\imagefit{b_surface_approximation_2_var}{B-сплайновая поверхность}
 
 
 

@@ -4,6 +4,7 @@
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
+\usepackage{caption}
 
 \usepackage{graphicx} % для вставки картинок
 \graphicspath{ {img/} }
@@ -47,5 +48,18 @@
 
 \usepackage{minted} % code highlighting
 
-\newcommand{\imagefit}[1]{
-  \centerline{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{#1}}}
+% Заменить Рис -> Рисунок. Заменить двоеточие на дефис в подписи.
+\RequirePackage{caption}
+\DeclareCaptionLabelSeparator{defffis}{ -- }
+\captionsetup{justification=centering,labelsep=defffis}
+\addto\captionsenglish{\renewcommand{\figurename}{Вавава.}}
+\captionsetup{
+  figurename=Рисунок,
+}
+
+\newcommand{\imagefit}[2]{
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{#1}
+    \caption{#2}
+  \end{figure}}
