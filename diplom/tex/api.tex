@@ -1,0 +1,53 @@
+\section{Интерфейс библиотеки}
+
+Разработанная библиотека предоставляет 3 функции:
+
+\begin{minted}[gobble=2]{clojure}
+  (interpolate points type & options)
+
+  (interpolate-parametric points type & options)
+
+  (interpolate-grid grid type & options)
+\end{minted}
+
+Все вышеперечисленные функции имеют похожую сигнатуру. Они принимают следующие параметры:
+
+\begin{itemize}
+\item \texttt{points} или \texttt{grid} - набор точек или сетка, которые требуется интерполировать;
+\item \texttt{type} - тип интерполяции;
+\item \texttt{options} - дополнительные опции, специфичные для каждой функции и типа интерполяции;
+\end{itemize}
+
+Все функции возвращают новую функцию - интерполирующую функцию, с помощью которой находятся значения в интересующих точках.
+
+\subsection{Функция \texttt{interpolate}}
+
+Данная функция позволяет по строить интерполирующую функцию $f(x) = y$ по заданному набору точек $(x_i, y_i)$. Точки могут задаваться в любом порядке, перед использованием они будут отсортированы по координате $x$. Данная функция поддерживает следующие типы интерполяции: линейная, полиномиальная, кубический сплайн, кубический Эрмитов сплайн, среднеквадратичное приближения. Сооветствующие аргументы для параметра \texttt{type}: \texttt{:linear}, \texttt{:polynomial}, \texttt{:cubic}, \texttt{:cubic-hermite}, \texttt{:linear-least-squares}.
+
+\subsubsection{Дополнительные опции:}
+\begin{itemize}
+\item \texttt{:boundaries} - граничные условия для кубического сплайна. Поддерживаются 2 вида условий: естественные (\texttt{:natural})
+                             и замкнутые (\texttt{:closed});
+\item \texttt{:derivatives} - производные для кубического Эрмитова сплайна;
+\item \texttt{:basis}, \texttt{:n}, \texttt{:degree} - опции настройки среднеквадратичного приближения. Позволяют задать базис, произвольный или один из 2 встроенных (полиномиальный и B-сплайны); число функций в базисе, если выбран встроенный; степень B-сплайнов;
+\end{itemize}
+
+\subsubsection{Пример:}
+
+Построение кубического спалйна с замкнутыми граничными условиями по точкам $(0, 0), (1, 3), (2, 0), (4, 2)$:
+
+\begin{minted}[gobble=2,frame=single]{clojure}
+  (def points [[0 0] [1 3] [2 0] [4 2]])
+
+  (def cubic (interpolate points :cubic :boundaries :closed))
+
+  (cubic 0) ; 0.0
+  (cubic 1) ; 3.0
+  (cubic 3) ; -1.2380952380952381
+\end{minted}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../document"
+%%% End:
