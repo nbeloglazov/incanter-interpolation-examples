@@ -22,7 +22,7 @@ Incanter - математический пакет для алгебраичес
 
 Работа с матрицами
 
-\begin{minted}{clojure}
+\begin{minted}[gobble=2,frame=single]{clojure}
 
   (def a (matrix [[1 2 3] [4 4 6] [7 8 9]])) ; matrix 3x3
 
@@ -38,13 +38,13 @@ Incanter - математический пакет для алгебраичес
 
 Построение графиков
 
-\begin{minted}{clojure}
+\begin{minted}[gobble=2,frame=single]{clojure}
   (view (histogram (sample-normal 1000)))
 \end{minted}
 
 \imagefit{histogram_example}{Пример гистограммы нормального распределения}
 
-\begin{minted}{clojure}
+\begin{minted}[gobble=2,frame=single]{clojure}
   (view (function-plot sin -10 10))
 \end{minted}
 
