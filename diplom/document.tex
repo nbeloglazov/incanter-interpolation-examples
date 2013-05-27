@@ -1,12 +1,17 @@
 \documentclass[a4paper,14pt,russian]{extreport}
 \usepackage{mystyle}
 \begin{document}
+\include{tex/annotation}
+\include{tex/referat}
 \tableofcontents
-%\include{tex/intro}
-%\include{tex/clojure_lang}
-%\include{tex/incanter}
-%\include{tex/interpolation_common}
-%\include{tex/interpolation_1_var}
-%\include{tex/interpolation_2_var}
+\include{tex/intro}
+\include{tex/clojure_lang}
+\include{tex/incanter}
+\include{tex/interpolation_common}
+\include{tex/interpolation_1_var}
+\include{tex/interpolation_2_var}
 \include{tex/api}
+\include{tex/results}
+\include{tex/bibliography}
+\addtocounter{page}{-1} % хак, почему-то page на 1 больше в конце и я не хочу искать причину сейчас
 \end{document}

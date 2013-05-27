@@ -6,6 +6,9 @@
 \usepackage[russian]{babel}
 \usepackage{caption}
 
+\usepackage[nottoc,section,numbib]{tocbibind} % литературу в содержание
+
+
 \usepackage{graphicx} % для вставки картинок
 \graphicspath{ {img/} }
 
@@ -15,11 +18,18 @@
 \usepackage{multirow} % улучшенное форматирование таблиц
 \usepackage{ulem} % подчеркивания
 
-
 \usepackage{setspace}
-%\onehalfspacing
+
+\usepackage{pscyr}
 \renewcommand{\rmdefault}{ftm} % Times New Roman
 \frenchspacing
+
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\hypersetup{
+  colorlinks,
+  citecolor=Violet,
+  linkcolor=Black,
+  urlcolor=Blue}
 
 % Нумерация
 \usepackage{fancyhdr}
@@ -33,9 +43,25 @@
 \renewcommand{\footrulewidth}{0pt}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \rhead{\thepage}}
-\setcounter{page}{1} % начать нумерацию страниц с №5
+  \cfoot{\thepage}}
+\setcounter{page}{2} % начать нумерацию страниц с x
 
+% Оглавление
+
+\usepackage{tocloft}
+\renewcommand{\cfttoctitlefont}{\Large\bfseries}
+
+% число страниц, рисунков, формул
+\usepackage{totcount}
+\regtotcounter{figure}
+\regtotcounter{page}
+\regtotcounter{equation}
+
+% подсчёт числа литературы
+\newtotcounter{bibitems}
+\def\oldbibitem{}
+\let\oldbibitem=\bibitem
+\def\bibitem{\stepcounter{bibitems}\oldbibitem}
 
 % Поля
 \usepackage{geometry}
@@ -52,7 +78,6 @@
 \RequirePackage{caption}
 \DeclareCaptionLabelSeparator{defffis}{ -- }
 \captionsetup{justification=centering,labelsep=defffis}
-\addto\captionsenglish{\renewcommand{\figurename}{Вавава.}}
 \captionsetup{
   figurename=Рисунок,
 }
