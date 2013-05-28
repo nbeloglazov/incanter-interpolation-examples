@@ -48,6 +48,15 @@
 \maketitle
 \begin{frame}[fragile]
   \frametitle{Clojure}
+
+  \begin{itemize}
+  \item Язык cемейства Лисп.
+  \item Выполняется на Java Virtual Machine (JVM).
+  \item Функциональное программирование.
+  \item Неизменяемые структуры данны.
+  \item Макросы.
+  \end{itemize}
+\iffalse
   \centering Пример функции $f'(x) \approx \frac{f(x+h) - f(x)}{h}$
   \begin{minted}[bgcolor=bg,gobble=4,frame=single]{clojure}
     (defn derivative [f x]
@@ -63,6 +72,8 @@
     (derivative f2 0) ; 0.00001
     (derivative f2 4) ; 8.00001
   \end{minted}
+\fi
+
 \end{frame}
 
 \begin{frame}
