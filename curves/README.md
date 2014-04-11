@@ -8,8 +8,8 @@ You can launch app via `lein run`.
 
 ### Control
 
-mouse left button - add point
-mouse right button - remove point
+mouse left button - add point  
+mouse right button - remove point  
 points are draggable
 
 ### Screenshot
